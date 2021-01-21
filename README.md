@@ -16,6 +16,7 @@
 **启动**
 > php easyswoole server start
 
+**进度**
 - [x] Worker
 - [x] Crontab
 - [ ] Woker,Crontab自动注册

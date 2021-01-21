@@ -23,5 +23,16 @@ return [
     'LOG_DIR' => null,
 
     // 项目标识
-    'symbol' => 'joyboo'
+    'symbol' => 'joyboo',
+
+    'mysql' => [
+        'new_central' => [
+            'dbname' => 'new_central',
+            'host' => '127.0.0.1',
+            'port' => 3306,
+            'pwd' => '0987abc123'
+        ]
+    ],
+    // 慢日志阀值，秒
+    'mysql_slow_time' => 3
 ];

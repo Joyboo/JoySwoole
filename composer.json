@@ -24,7 +24,8 @@
         "easyswoole/http-annotation": "^1.4",
         "easyswoole/ddl": "^1.0",
         "easyswoole/spider": "^2.0",
-        "easyswoole/task": "^1.1"
+        "easyswoole/task": "^1.1",
+        "easyswoole/redis-pool": "^2.2"
     },
     "autoload": {
         "psr-4": {

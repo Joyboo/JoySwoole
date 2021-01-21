@@ -1,6 +1,6 @@
 <?php
 return [
-    'SERVER_NAME' => "EasySwoole",
+    'SERVER_NAME' => "easyswoole",
     'MAIN_SERVER' => [
         'LISTEN_ADDRESS' => '0.0.0.0',
         'PORT' => 9501,
@@ -18,6 +18,10 @@ return [
             'timeout'=>15
         ]
     ],
+    // .sock连接目录
     'TEMP_DIR' => '/tmp/easyswoole',
-    'LOG_DIR' => null
+    'LOG_DIR' => null,
+
+    // 项目标识
+    'symbol' => 'joyboo'
 ];

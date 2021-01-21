@@ -14,4 +14,22 @@
 > composer install
  
 **启动**
-> php easyswoole start
+> php easyswoole server start
+
+- [x] Worker
+- [x] Crontab
+- [ ] Woker,Crontab自动注册
+- [ ] Crontab支持从数据库配置
+- [x] Timer
+- [x] HttpServer
+- [ ] 模型封装
+- [ ] 修改Logger处理器
+- [ ] 修改Trigger处理器
+- [ ] 修改Error处理器
+- [ ] 修改Shutdown处理器
+- [ ] 修改HttpException全局处理器
+- [ ] 设置Http全局OnRequest及AfterRequest事件
+- [ ] 注册子服务
+- [ ] SwooleTable/Atomic共享内存
+- [ ] 注册mysql,redis连接池
+- [ ] 注册回调事件

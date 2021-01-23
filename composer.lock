@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "054b9a0741b874341a88fb1251943815",
+    "content-hash": "d5181f08d95d7a1c5aec95938b203d89",
     "packages": [
         {
             "name": "cache/adapter-common",
@@ -1194,6 +1194,43 @@
             "time": "2020-11-05T05:47:46+00:00"
         },
         {
+            "name": "easyswoole/i18n",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/easy-swoole/i18n.git",
+                "reference": "55e68a06a5c57ee852c85e7559a500dfeff35bbf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/easy-swoole/i18n/zipball/55e68a06a5c57ee852c85e7559a500dfeff35bbf",
+                "reference": "55e68a06a5c57ee852c85e7559a500dfeff35bbf",
+                "shasum": ""
+            },
+            "require": {
+                "easyswoole/component": "^2.2"
+            },
+            "require-dev": {
+                "easyswoole/phpunit": "^1.0",
+                "easyswoole/swoole-ide-helper": "^1.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EasySwoole\\I18N\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "support": {
+                "issues": "https://github.com/easy-swoole/i18n/issues",
+                "source": "https://github.com/easy-swoole/i18n/tree/master"
+            },
+            "time": "2020-04-18T08:34:32+00:00"
+        },
+        {
             "name": "easyswoole/jwt",
             "version": "1.1.3",
             "source": {
@@ -2180,6 +2217,62 @@
             "time": "2020-12-01T13:43:22+00:00"
         },
         {
+            "name": "easyswoole/template",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/easy-swoole/template.git",
+                "reference": "59a18706190276a58878a51118441e88ba5df361"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/easy-swoole/template/zipball/59a18706190276a58878a51118441e88ba5df361",
+                "reference": "59a18706190276a58878a51118441e88ba5df361",
+                "shasum": ""
+            },
+            "require": {
+                "easyswoole/component": "^2.0",
+                "easyswoole/spl": "^1.0"
+            },
+            "require-dev": {
+                "duncan3dc/blade": "^4.5",
+                "easyswoole/phpunit": "^1.0",
+                "easyswoole/swoole-ide-helper": "^1.1",
+                "league/plates": "3.*",
+                "smarty/smarty": "~3.1",
+                "topthink/think-template": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EasySwoole\\Template\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "YF",
+                    "email": "291323003@qq.com"
+                }
+            ],
+            "description": "An efficient swoole framework",
+            "homepage": "https://www.easyswoole.com/",
+            "keywords": [
+                "async",
+                "easyswoole",
+                "framework",
+                "swoole"
+            ],
+            "support": {
+                "issues": "https://github.com/easy-swoole/template/issues",
+                "source": "https://github.com/easy-swoole/template/tree/1.1.0"
+            },
+            "time": "2020-12-29T03:34:39+00:00"
+        },
+        {
             "name": "easyswoole/tracker",
             "version": "1.1.1",
             "source": {
@@ -2426,6 +2519,48 @@
                 "source": "https://github.com/easy-swoole/validate/tree/1.2.7"
             },
             "time": "2020-10-30T08:20:19+00:00"
+        },
+        {
+            "name": "easyswoole/verifycode",
+            "version": "3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/easy-swoole/verify-code.git",
+                "reference": "d79497dc1b1c7bbaeceb0c62fea6a9a96f7957cb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/easy-swoole/verify-code/zipball/d79497dc1b1c7bbaeceb0c62fea6a9a96f7957cb",
+                "reference": "d79497dc1b1c7bbaeceb0c62fea6a9a96f7957cb",
+                "shasum": ""
+            },
+            "require": {
+                "easyswoole/spl": "^1.0",
+                "ext-gd": "*",
+                "php": ">=7.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EasySwoole\\VerifyCode\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "YF",
+                    "email": "291323003@qq.com"
+                },
+                {
+                    "name": "evalor",
+                    "email": "mipone@foxmail.com"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/easy-swoole/verify-code/issues",
+                "source": "https://github.com/easy-swoole/verify-code/tree/3.0.2"
+            },
+            "time": "2020-07-28T04:12:59+00:00"
         },
         {
             "name": "easyswoole/wechat",

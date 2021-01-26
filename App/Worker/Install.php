@@ -3,11 +3,16 @@
 
 namespace App\Worker;
 
+use \App\Models\Install as InstallModel;
 
 class Install extends Base
 {
     public function exec($task)
     {
-        // TODO: Implement exec() method.
+        if (!is_array($task)) {
+            return;
+        }
+
+        InstallModel::create()->data($task, true)->save();
     }
 }

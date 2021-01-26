@@ -34,5 +34,7 @@ return [
         ]
     ],
     // 慢日志阀值，秒
-    'mysql_slow_time' => 3
+    'mysql_slow_time' => 3,
+    // redis连接池参数
+    'redis_poll' => [],
 ];

@@ -49,7 +49,8 @@ class EasySwooleEvent implements Event
      */
     public static function registerWorker()
     {
-        $worker = EASYSWOOLE_ROOT . "/App/Common/config/worker.php";
+        $worker = include_once EASYSWOOLE_ROOT . "/App/Common/config/worker.php";
+        // 单个项目额外定义的worker
         $cfgWorker = Config::getInstance()->getConf('worker_list');
         if (is_array($cfgWorker)) {
             $worker = array_merge($worker, $cfgWorker);
@@ -60,6 +61,7 @@ class EasySwooleEvent implements Event
             for ($i = 1; $i <= $psnum; ++$i) {
                 $processConfig= new \EasySwoole\Component\Process\Config();
                 $processConfig->setProcessName("worker_process_{$key}_{$i}");
+                $processConfig->setArg($value);
 
                 $class = "\\App\\Worker\\{$key}";
                 if (!class_exists($class)) {
@@ -78,12 +80,40 @@ class EasySwooleEvent implements Event
      */
     public static function registerRedis()
     {
-        $redisPoolConfig = RedisPool::getInstance()->register(new RedisConfig(),'redis');
-        //配置连接池连接数
-        $redisPoolConfig->setMinObjectNum(5);
-        $redisPoolConfig->setMaxObjectNum(20);
+        $poolCfg = Config::getInstance()->getConf('redis_poll');
+        $redisCfg = Config::getInstance()->getConf('redis');
 
-        // todo 上次写到这里
+        $redisConfig = new RedisConfig();
+        if (isset($redisCfg['host'])) {
+            $redisConfig->setHost($redisCfg['host']);
+        }
+        if (isset($redisCfg['port'])) {
+            $redisConfig->setPort($redisCfg['port']);
+        }
+        if (isset($redisCfg['auth'])) {
+            $redisConfig->setAuth($redisCfg['auth']);
+        }
+        if (isset($redisCfg['timeout'])) {
+            $redisConfig->setTimeout($redisCfg['timeout']);
+        }
+        if (isset($redisCfg['db'])) {
+            $redisConfig->setDb($redisCfg['db']);
+        }
+        if (isset($redisCfg['unixsock'])) {
+            $redisConfig->setUnixSocket($redisCfg['unixsock']);
+        }
+
+        $redisPoolConfig = RedisPool::getInstance()->register($redisConfig);
+        if (isset($poolCfg['min_num'])) {
+            $redisPoolConfig->setMinObjectNum($poolCfg['min_num']);
+        }
+        if (isset($poolCfg['max_num'])) {
+            $redisPoolConfig->setMaxObjectNum($poolCfg['max_num']);
+        }
+        if (isset($poolCfg['max_idle'])) {
+            $redisPoolConfig->setMaxIdleTime($poolCfg['max_idle']);
+        }
+        // ...
     }
 
     /**
@@ -167,11 +197,22 @@ class EasySwooleEvent implements Event
      */
     public static function loadConfig()
     {
+        $config = Config::getInstance()->getConf();
         // 当前运行的项目
-        $symbol = $conf = Config::getInstance()->getConf('symbol');
+        $symbol = $config['symbol'];
         if (empty($symbol)) {
             return;
         }
-        Config::getInstance()->loadFile(EASYSWOOLE_ROOT . "/App/Common/config/{$symbol}.php");
+        $filePath = EASYSWOOLE_ROOT . "/App/Common/config/{$symbol}.php";
+//        Config::getInstance()->loadFile($filePath);
+        if (!file_exists($filePath)) {
+            return;
+        }
+        $confData = require_once $filePath;
+        if (!is_array($confData)) {
+            return;
+        }
+        $merge = array_merge_multi($config, $confData);
+        Config::getInstance()->load($merge);
     }
 }

@@ -9,6 +9,7 @@ use EasySwoole\Component\Process\AbstractProcess;
  * 消费消息队列
  * Class Base
  * @package App\Worker
+ * @document 自定义进程： https://www.easyswoole.com/Components/Component/process.html
  */
 abstract class Base extends AbstractProcess
 {
@@ -20,25 +21,29 @@ abstract class Base extends AbstractProcess
          * 举例，消费redis中的队列数据
          * 定时500ms检测有没有任务，有的话就while死循环执行
          */
-        $this->addTick(500, function (){
+        $this->addTick(500, function () {
+            $param = $this->getArg();
             if (!$this->isRun) {
                 $this->isRun = true;
-                $redis = new \redis();// todo 此处为伪代码，请自己建立连接或者维护redis连接
+                $redis = $this->getRedis();
+                if (isset($param['redis']['db'])) {
+                    $redis->select($param['redis']['db']);
+                }
                 while (true){
                     try{
-                        $task = $redis->lPop('task_list');
+                        $task = $redis->lPop($param['redis']['queue']);
                         if (!$task) {
                             break;
                         }
-                        // todo 异常处理
-                        $this->exec($task);
+
+                        $decode = json_decode($task, true);
+                        $this->exec(is_array($decode) ? $decode : $task);
                     } catch (\Throwable $throwable){
                         break;
                     }
                 }
                 $this->isRun = false;
             }
-            var_dump($this->getProcessName().' task run check');
         });
     }
 
@@ -48,6 +53,16 @@ abstract class Base extends AbstractProcess
 
     public function onReceive(string $str, ...$args)
     {
+    }
+
+    protected function getRedis()
+    {
+        return \EasySwoole\RedisPool\RedisPool::defer();
+    }
+
+    protected function getDb($name = 'new_central')
+    {
+        return \EasySwoole\ORM\DbManager::getInstance()->getConnection($name)->defer();
     }
 
     /**

@@ -25,10 +25,7 @@
 - [x] HttpServer
 - [x] 模型封装
 - [x] 自定义Logger处理器
-- [ ] 自定义Trigger处理器
-- [ ] 自定义Error处理器
-- [ ] 自定义Shutdown处理器
-- [ ] 自定义HttpException全局处理器
+- [x] 自定义异常处理器
 - [ ] 设置Http全局OnRequest及AfterRequest事件
 - [ ] 注册子服务
 - [ ] SwooleTable/Atomic共享内存

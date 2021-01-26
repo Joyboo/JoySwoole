@@ -16,7 +16,7 @@ if (!function_exists('model')) {
     function model($name = '')
     {
         $path = '\\App\\Models';
-        $symbol = Config::getInstance()->getConf('symbol');
+        $symbol = config('symbol');
         $class = "{$path}\\{$symbol}\\{$name}";
         if (class_exists($class)) {
             return new $class();
@@ -123,5 +123,58 @@ if (!function_exists('config')) {
             return $config->getConf($name);
         }
         return $config->setConf($name, $value);
+    }
+}
+
+if (!function_exists('curl')) {
+    /**
+     * 发起curl请求
+     * @param string $method
+     * @param string $url
+     * @param array|null $params
+     * @return \EasySwoole\Curl\Response
+     */
+    function curl(string $method, string $url, array $params = null): \EasySwoole\Curl\Response
+    {
+        $request = new \EasySwoole\Curl\Request( $url );
+        switch( strtoupper($method) ){
+            case 'GET' :
+                if( $params && isset( $params['query'] ) ){
+                    foreach( $params['query'] as $key => $value ){
+                        $request->addGet( new \EasySwoole\Curl\Field( $key, $value ) );
+                    }
+                }
+                break;
+            case 'POST' :
+                if( $params && isset( $params['form_params'] ) ){
+                    foreach( $params['form_params'] as $key => $value ){
+                        $request->addPost( new \EasySwoole\Curl\Field( $key, $value ) );
+                    }
+                }elseif($params && isset( $params['body'] )){
+                    if(!isset($params['header']['Content-Type']) ){
+                        $params['header']['Content-Type'] = 'application/json; charset=utf-8';
+                    }
+                    $request->setUserOpt( [CURLOPT_POSTFIELDS => $params['body']] );
+                }
+                break;
+            default:
+                throw new \InvalidArgumentException( "method error" );
+                break;
+        }
+        if( isset( $params['header'] ) && !empty( $params['header'] ) && is_array( $params['header'] ) ){
+            foreach( $params['header'] as $key => $value ){
+                $string   = "{$key}:$value";
+                $header[] = $string;
+            }
+            $request->setUserOpt( [CURLOPT_HTTPHEADER => $header] );
+        }
+        /*if (isset($params['cookie'])) {
+            $cookie = new \EasySwoole\Curl\Cookie();
+            $request->addCookie();
+        }*/
+        if( isset( $params['opt'] ) && !empty( $params['opt'] ) && is_array( $params['opt'] ) ){
+            $request->setUserOpt($params['opt']);
+        }
+        return $request->exec();
     }
 }

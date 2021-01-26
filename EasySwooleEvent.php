@@ -6,6 +6,8 @@ namespace EasySwoole\EasySwoole;
 
 use App\Crontab\Central;
 use App\Hander\LogHander;
+use App\Hander\TriggerHander;
+use EasySwoole\Component\Process\Exception;
 use EasySwoole\Component\Process\Manager;
 use EasySwoole\Component\Timer;
 use EasySwoole\EasySwoole\AbstractInterface\Event;
@@ -26,6 +28,9 @@ class EasySwooleEvent implements Event
 
         // 注册自定义日志处理器
         Logger::getInstance(new LogHander());
+
+        // 注册自定义异常处理器
+        Trigger::getInstance(new TriggerHander());
 
         // 加载自定义配置
         self::loadConfig();
@@ -74,9 +79,7 @@ class EasySwooleEvent implements Event
 
                 $class = "\\App\\Worker\\{$key}";
                 if (!class_exists($class)) {
-                    //todo excaption
-                    logger()->error($class . ' worker not found', 'error');
-                    return;
+                    throw new Exception($class . ' worker not found');
                 }
 
                 Manager::getInstance()->addProcess(new $class($processConfig));

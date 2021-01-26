@@ -4,7 +4,6 @@
 namespace App\Crontab;
 
 use EasySwoole\EasySwoole\Crontab\AbstractCronTask;
-use EasySwoole\EasySwoole\Task\TaskManager;
 
 
 /**
@@ -40,6 +39,6 @@ class Central extends AbstractCronTask
 
     public function onException(\Throwable $throwable, int $taskId, int $workerIndex)
     {
-        // 捕获run方法内所抛出的异常
+        throw $throwable;
     }
 }

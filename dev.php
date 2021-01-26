@@ -37,4 +37,6 @@ return [
     'mysql_slow_time' => 3,
     // redis连接池参数
     'redis_poll' => [],
+    // 日志目录格式
+    'logger_dir_format' => 'Ym',
 ];

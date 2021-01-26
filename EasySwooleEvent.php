@@ -5,6 +5,7 @@ namespace EasySwoole\EasySwoole;
 
 
 use App\Crontab\Central;
+use App\Hander\LogHander;
 use EasySwoole\Component\Process\Manager;
 use EasySwoole\Component\Timer;
 use EasySwoole\EasySwoole\AbstractInterface\Event;
@@ -14,6 +15,8 @@ use EasySwoole\ORM\Db\Connection;
 use EasySwoole\ORM\DbManager;
 use EasySwoole\RedisPool\RedisPool;
 use EasySwoole\Redis\Config\RedisConfig;
+use EasySwoole\ORM\Db\Result;
+use EasySwoole\Mysqli\QueryBuilder;
 
 class EasySwooleEvent implements Event
 {
@@ -21,10 +24,16 @@ class EasySwooleEvent implements Event
     {
         date_default_timezone_set('Asia/Shanghai');
 
+        // 注册自定义日志处理器
+        Logger::getInstance(new LogHander());
+
+        // 加载自定义配置
         self::loadConfig();
 
+        // 注册mysql连接池
         self::registerDb();
 
+        // 注册redis连接池
         self::registerRedis();
     }
 
@@ -51,7 +60,7 @@ class EasySwooleEvent implements Event
     {
         $worker = include_once EASYSWOOLE_ROOT . "/App/Common/config/worker.php";
         // 单个项目额外定义的worker
-        $cfgWorker = Config::getInstance()->getConf('worker_list');
+        $cfgWorker = config('worker_list');
         if (is_array($cfgWorker)) {
             $worker = array_merge($worker, $cfgWorker);
         }
@@ -66,7 +75,7 @@ class EasySwooleEvent implements Event
                 $class = "\\App\\Worker\\{$key}";
                 if (!class_exists($class)) {
                     //todo excaption
-                    var_dump($class . ' not found, woker');
+                    logger()->error($class . ' worker not found', 'error');
                     return;
                 }
 
@@ -80,8 +89,8 @@ class EasySwooleEvent implements Event
      */
     public static function registerRedis()
     {
-        $poolCfg = Config::getInstance()->getConf('redis_poll');
-        $redisCfg = Config::getInstance()->getConf('redis');
+        $poolCfg = config('redis_poll');
+        $redisCfg = config('redis');
 
         $redisConfig = new RedisConfig();
         if (isset($redisCfg['host'])) {
@@ -122,8 +131,8 @@ class EasySwooleEvent implements Event
      */
     public static function registerDb()
     {
-        $config = Config::getInstance()->getConf('mysql');
-        $slow = intval(Config::getInstance()->getConf('mysql_slow_time'));
+        $config = config('mysql');
+        $slow = intval(config('mysql_slow_time'));
 
         if (empty($config)) {
             return;
@@ -180,13 +189,18 @@ class EasySwooleEvent implements Event
          * 如果不想使用全局性的onQuery, 可以在执行操作的时候调用onQuery方法, 以此来实现针对特定模型的回调
          * 实例:  User::create()->onQuery(function ($res, $builder, $start) {})->get(1);
          */
-        DbManager::getInstance()->onQuery(function (\EasySwoole\ORM\Db\Result $res,\EasySwoole\Mysqli\QueryBuilder $builder,float $start) use ($slow) {
-            $sql = $builder->getLastQuery();
-            var_dump($sql);
-            if (bcsub(time(), $start, 3) >= $slow) {
-                // todo 记录慢日志
+        DbManager::getInstance()->onQuery(
+            function (Result $res, QueryBuilder $builder,float $start) use ($slow) {
+                $sql = $builder->getLastQuery();
+                if (runEnvDev()) {
+                    logger()->log($sql);
+                }
+                if ($slow && bcsub(time(), $start, 3) >= $slow) {
+                    // 慢日志
+                    logger()->waring($sql, 'sql_long');
+                }
             }
-        });
+        );
     }
 
     /**
@@ -197,7 +211,7 @@ class EasySwooleEvent implements Event
      */
     public static function loadConfig()
     {
-        $config = Config::getInstance()->getConf();
+        $config = config();
         // 当前运行的项目
         $symbol = $config['symbol'];
         if (empty($symbol)) {

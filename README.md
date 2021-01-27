@@ -19,8 +19,6 @@
 **进度**
 - [x] Worker
 - [x] Crontab
-- [ ] Crontab自动注册
-- [ ] Crontab支持从数据库配置
 - [x] Timer
 - [x] HttpServer
 - [x] 模型封装
@@ -29,9 +27,7 @@
 - [ ] 设置Http全局OnRequest及AfterRequest事件
 - [ ] 注册子服务
 - [ ] SwooleTable/Atomic共享内存
-- [ ] 注册mysql,redis连接池
+- [x] 注册mysql,redis连接池
 - [ ] 注册回调事件
 
-
-**Worker**
 

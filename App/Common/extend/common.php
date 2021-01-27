@@ -15,15 +15,12 @@ if (!function_exists('model')) {
      */
     function model($name = '')
     {
-        $path = '\\App\\Models';
-        $symbol = config('symbol');
-        $class = "{$path}\\{$symbol}\\{$name}";
-        if (class_exists($class)) {
-            return new $class();
-        }
-        $class = "{$path}\\{$name}";
-        if (class_exists($class)) {
-            return new $class;
+        $namespace = config('model_namespace');
+        foreach ($namespace as $np) {
+            $class = "{$np}\\{$name}";
+            if (class_exists($class)) {
+                return new $class();
+            }
         }
         throw new \Exception("model not found: {$name}");
     }

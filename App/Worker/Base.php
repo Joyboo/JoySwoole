@@ -22,33 +22,36 @@ abstract class Base extends AbstractProcess
          * 定时500ms检测有没有任务，有的话就while死循环执行
          */
         $this->addTick(500, function () {
+            if ($this->isRun) {
+                return;
+            }
             $param = $this->getArg();
-            if (!$this->isRun) {
-                $this->isRun = true;
-                $redis = $this->getRedis();
-                if (isset($param['redis']['db'])) {
-                    $redis->select($param['redis']['db']);
-                }
-                while (true){
-                    try{
-                        $task = $redis->lPop($param['redis']['queue']);
-                        if (!$task) {
-                            break;
-                        }
 
-                        $decode = json_decode($task, true);
-                        $this->exec(is_array($decode) ? $decode : $task);
-                    } catch (\Throwable $throwable){
+            $this->isRun = true;
+            $redis = $this->getRedis();
+            if (isset($param['redis']['db'])) {
+                $redis->select($param['redis']['db']);
+            }
+            while (true){
+                try{
+                    $task = $redis->lPop($param['redis']['queue']);
+                    if (!$task) {
                         break;
                     }
+
+                    $decode = json_decode($task, true);
+                    $this->exec(is_array($decode) ? $decode : $task);
+                } catch (\Throwable $throwable){
+                    throw $throwable;
                 }
-                $this->isRun = false;
             }
+            $this->isRun = false;
         });
     }
 
     public function onShutDown()
     {
+        $this->isRun = false;
     }
 
     public function onReceive(string $str, ...$args)

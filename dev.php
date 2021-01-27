@@ -1,5 +1,5 @@
 <?php
-return [
+$_config = [
     'SERVER_NAME' => "easyswoole",
     'MAIN_SERVER' => [
         'LISTEN_ADDRESS' => '0.0.0.0',
@@ -28,6 +28,7 @@ return [
     'mysql' => [
         'new_central' => [
             'dbname' => 'new_central',
+//            'dbname' => 'joyboo',
             'host' => '127.0.0.1',
             'port' => 3306,
             'pwd' => '0987abc123'
@@ -40,3 +41,16 @@ return [
     // 日志目录格式
     'logger_dir_format' => 'Ym',
 ];
+
+// model命名空间
+$_config['model_namespace'] = [
+    '\\App\\Models\\' . $_config['symbol'],
+    '\\App\\Models',
+];
+// crontab命名空间
+$_config['crontab_namespace'] = [
+    '\\App\\Crontab\\Controller'  . $_config['symbol'],
+    '\\App\\Crontab\\Controller',
+];
+
+return $_config;

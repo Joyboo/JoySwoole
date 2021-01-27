@@ -196,7 +196,7 @@ class EasySwooleEvent implements Event
             function (Result $res, QueryBuilder $builder,float $start) use ($slow) {
                 $sql = $builder->getLastQuery();
                 if (runEnvDev()) {
-                    logger()->log($sql);
+                    logger()->info($sql, 'sql');
                 }
                 if ($slow && bcsub(time(), $start, 3) >= $slow) {
                     // 慢日志

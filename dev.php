@@ -47,10 +47,5 @@ $_config['model_namespace'] = [
     '\\App\\Models\\' . $_config['symbol'],
     '\\App\\Models',
 ];
-// crontab命名空间
-$_config['crontab_namespace'] = [
-    '\\App\\Crontab\\Controller'  . $_config['symbol'],
-    '\\App\\Crontab\\Controller',
-];
 
 return $_config;

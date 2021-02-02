@@ -28,9 +28,6 @@ class LogHander implements LoggerInterface
         if ($format = config('logger_dir_format')) {
             $this->logDir .= '/' . date($format);
         }
-        if (!is_dir($this->logDir)) {
-            File::createDirectory($logDir, 0777);
-        }
     }
 
     function log(?string $msg, int $logLevel = self::LOG_LEVEL_INFO, string $category = 'debug'):string
@@ -40,6 +37,7 @@ class LogHander implements LoggerInterface
 
         $file = date('d') . ($category ? "_{$category}" : '') . '.log';
         $filePath = $this->logDir . "/{$file}";
+        File::touchFile($filePath, false);
         $str = "[{$date}][{$levelStr}] : {$msg}\n";
         file_put_contents($filePath,"{$str}",FILE_APPEND|LOCK_EX);
         return $str;

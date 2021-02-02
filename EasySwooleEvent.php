@@ -74,7 +74,7 @@ class EasySwooleEvent implements Event
                 $processConfig->setProcessName("worker_process_{$key}_{$i}");
                 $processConfig->setArg($value);
 
-                $class = "\\App\\Worker\\{$key}";
+                $class = $value['class'] ?? "\\App\\Worker\\{$key}";
                 if (!class_exists($class)) {
                     throw new Exception($class . ' worker not found');
                 }

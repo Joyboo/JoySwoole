@@ -34,6 +34,11 @@ $_config = [
             'pwd' => '0987abc123'
         ]
     ],
+    // 是否需要做自动注册
+    'crontab' => [
+        \App\Crontab\Central::class,
+        \App\Crontab\LogFile::class
+    ],
     // 慢日志阀值，秒
     'mysql_slow_time' => 3,
     // redis连接池参数

@@ -175,3 +175,18 @@ if (!function_exists('curl')) {
         return $request->exec();
     }
 }
+
+function getLogDirByStamp($stamp = 0)
+{
+    if (empty($stamp)) {
+        $stamp = time();
+    }
+    if (!is_numeric($stamp)) {
+        $stamp = strtotime($stamp);
+    }
+    $logDir = config('LOG_DIR');
+    if ($format = config('logger_dir_format')) {
+        $logDir .= '/' . date($format, $stamp);
+    }
+    return rtrim($logDir, '/') . '/';
+}

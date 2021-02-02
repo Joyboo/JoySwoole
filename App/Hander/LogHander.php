@@ -20,14 +20,9 @@ class LogHander implements LoggerInterface
     function __construct(string $logDir = null)
     {
         if(empty($logDir)){
-            $logDir = config('LOG_DIR');
+            $logDir = getLogDirByStamp();
         }
         $this->logDir = $logDir;
-
-        // 日志是否需要分目录，及分目录的格式
-        if ($format = config('logger_dir_format')) {
-            $this->logDir .= '/' . date($format);
-        }
     }
 
     function log(?string $msg, int $logLevel = self::LOG_LEVEL_INFO, string $category = 'debug'):string
@@ -36,7 +31,7 @@ class LogHander implements LoggerInterface
         $levelStr = $this->levelMap($logLevel);
 
         $file = date('d') . ($category ? "_{$category}" : '') . '.log';
-        $filePath = $this->logDir . "/{$file}";
+        $filePath = $this->logDir . $file;
         File::touchFile($filePath, false);
         $str = "[{$date}][{$levelStr}] : {$msg}\n";
         file_put_contents($filePath,"{$str}",FILE_APPEND|LOCK_EX);

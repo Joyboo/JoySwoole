@@ -3,8 +3,6 @@
 
 namespace EasySwoole\EasySwoole;
 
-
-use App\Crontab\Central;
 use App\Hander\LogHander;
 use App\Hander\TriggerHander;
 use EasySwoole\Component\Process\Exception;
@@ -49,8 +47,7 @@ class EasySwooleEvent implements Event
         // 注册消费进程
         self::registerWorker();
 
-        // 注册Crontab
-        Crontab::getInstance()->addTask(Central::class);
+        self::registerCrontab();
 
         // 注册Timer,高精度定时器，原型是swoole_timer_tick
         /*Timer::getInstance()->loop(10 * 1000, function () {
@@ -231,5 +228,17 @@ class EasySwooleEvent implements Event
         }
         $merge = array_merge_multi($config, $confData);
         Config::getInstance()->load($merge);
+    }
+
+
+    public static function registerCrontab ()
+    {
+        $crontab = config('crontab');
+        if (empty($crontab) || !is_array($crontab)) {
+            return;
+        }
+        foreach ($crontab as $cron) {
+            Crontab::getInstance()->addTask($cron);
+        }
     }
 }

@@ -36,8 +36,7 @@ $_config = [
     ],
     // 是否需要做自动注册
     'crontab' => [
-        \App\Crontab\Central::class,
-        \App\Crontab\LogFile::class
+        \App\Crontab\Central::class
     ],
     // 慢日志阀值，秒
     'mysql_slow_time' => 3,

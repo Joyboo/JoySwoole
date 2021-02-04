@@ -50,12 +50,18 @@ abstract class Base extends AbstractProcess
         });
     }
 
+    // 进程意外退出 触发此回调，大部分用于清理工作
     public function onShutDown()
     {
         $this->isRun = false;
     }
 
     public function onReceive(string $str, ...$args)
+    {
+    }
+
+    // 当进程接收到 SIGTERM 信号触发该回调
+    protected function onSigTerm()
     {
     }
 

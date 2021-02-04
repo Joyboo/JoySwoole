@@ -8,7 +8,7 @@ return [
             'queue' => 'report:install', // redis队列
             'db' => 9,
         ],
-        'type' => 'redis', // type|process
+        'type' => 'process', // type|process
         'param_list' => 'instime|account|channel|sid|regsid|isnew|pfid|logintime|os|bs'
     ]
 ];

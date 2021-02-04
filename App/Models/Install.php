@@ -14,7 +14,6 @@ class Install extends Base
      */
     protected static function onBeforeInsert($model)
     {
-        return false;
     }
 
     /**
@@ -28,7 +27,6 @@ class Install extends Base
 
     protected static function onBeforeUpdate($model)
     {
-        return false;
     }
 
     protected static function onAfterUpdate($model, $res)
@@ -37,7 +35,6 @@ class Install extends Base
 
     protected static function onBeforeDelete($model)
     {
-        return false;
     }
 
     /**

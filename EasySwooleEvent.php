@@ -42,7 +42,22 @@ class EasySwooleEvent implements Event
 
     public static function mainServerCreate(EventRegister $register)
     {
-        // todo 定义全局自动注册
+        $register->set(EventRegister::onManagerStart, function (\Swoole\Server $server) {
+            self::setProcessName(config('SERVER_NAME') . '.manager');
+        });
+        $register->set(EventRegister::onOpen, function ($ws, $request) {
+            var_dump($request->fd, $request->server);
+            $ws->push($request->fd, "hello, welcome\n");
+        });
+
+        $register->set(EventRegister::onMessage, function (\Swoole\WebSocket\Server $server, \Swoole\WebSocket\Frame $frame) {
+            echo "Message: {$frame->data}\n";
+            $server->push($frame->fd, "server: {$frame->data}");
+        });
+
+        $register->set(EventRegister::onClose, function (\Swoole\Server $ws, $fd) {
+            echo "client-{$fd} is closed\n";
+        });
 
         // 注册消费进程
         self::registerWorker();
@@ -67,19 +82,39 @@ class EasySwooleEvent implements Event
             $worker = array_merge($worker, $cfgWorker);
         }
 
-        foreach($worker as $key => $value) {
-            $psnum = intval($value['psnum'] ?? 1);
-            for ($i = 1; $i <= $psnum; ++$i) {
-                $processConfig= new \EasySwoole\Component\Process\Config();
-                $processConfig->setProcessName("worker_process_{$key}_{$i}");
-                $processConfig->setArg($value);
+        foreach ($worker as $key => $value) {
+            $key = ucfirst($key);
 
-                $class = $value['class'] ?? "\\App\\Worker\\{$key}";
-                if (!class_exists($class)) {
-                    throw new Exception($class . ' worker not found');
-                }
+            $proCfg = [
+                'processName' => $key,
+                'processGroup' => 'report',
+                'arg' => $value, // 传递参数到自定义进程中
+                'enableCoroutine' => true, // 设置 自定义进程自动开启协程环境
+            ];
 
-                Manager::getInstance()->addProcess(new $class($processConfig));
+            $class = $value['class'] ?? "\\App\\Worker\\{$key}";
+            if (!class_exists($class)) {
+                throw new Exception($class . ' worker not found');
+            }
+
+            switch ($value['type']) {
+                case "process":
+                    $processConfig = new \EasySwoole\Component\Process\Config($proCfg);
+                    $customProcess = new $class($processConfig);
+                    // 注入DI
+                    \EasySwoole\Component\Di::getInstance()->set($key, $customProcess->getProcess());
+                    Manager::getInstance()->addProcess($customProcess);
+                    break;
+                case "redis":
+                    $psnum = intval($value['psnum'] ?? 1);
+                    for ($i = 1; $i <= $psnum; ++$i) {
+                        $proCfg['processName'] = $key . '_' . $i;
+                        $processConfig = new \EasySwoole\Component\Process\Config($proCfg);
+                        Manager::getInstance()->addProcess(new $class($processConfig));
+                    }
+                    break;
+                default:
+                    throw new Exception('自定义进程type error: ' . $value['type']);
             }
         }
     }
@@ -239,6 +274,13 @@ class EasySwooleEvent implements Event
         }
         foreach ($crontab as $cron) {
             Crontab::getInstance()->addTask($cron);
+        }
+    }
+
+    public static function setProcessName($processName = '')
+    {
+        if (!in_array(PHP_OS, ['Darwin', 'CYGWIN', 'WINNT']) && !empty($processName)) {
+            cli_set_process_title($processName);
         }
     }
 }

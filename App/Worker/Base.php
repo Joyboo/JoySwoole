@@ -4,6 +4,7 @@
 namespace App\Worker;
 
 use EasySwoole\Component\Process\AbstractProcess;
+use Swoole\Process;
 
 /**
  * 消费消息队列
@@ -68,9 +69,21 @@ abstract class Base extends AbstractProcess
         return \EasySwoole\ORM\DbManager::getInstance()->getConnection($name)->defer();
     }
 
+    protected function onPipeReadable(Process $process)
+    {
+        // 该回调可选
+        // 当主进程对子进程发送消息的时候 会触发
+        $recvMsgFromMain = $process->read(); // 用于获取主进程给当前进程发送的消息
+        var_dump('收到主进程发送的消息: ');
+        var_dump($recvMsgFromMain);
+    }
+
     /**
      * 子类执行逻辑
      * @return mixed
      */
-    abstract protected function exec($task);
+    protected function exec($task)
+    {
+
+    }
 }

@@ -9,6 +9,6 @@ class Crontab extends Base
 
     public function getCrontab($gid = 0)
     {
-        return $this->where('status', 0)->where("(gid = 0 or FIND_IN_SET ({$gid},gid) > 0)")->get();
+        return $this->where('status', 0)->where("(gid = 0 or FIND_IN_SET ({$gid},gid) > 0)")->all();
     }
 }

@@ -8,6 +8,16 @@ use EasySwoole\Http\Message\Status;
 
 abstract class Base extends Controller
 {
+    protected function onRequest(?string $action): ?bool
+    {
+        // 权限不通过 / 请登录
+        /*$this->response()->withHeader('Content-type', 'application/json;charset=utf-8');
+        $this->response()->write("没有权限");
+        $this->response()->withStatus(Status::CODE_FORBIDDEN);
+        return false;*/
+        return true;
+    }
+
     function onException(\Throwable $throwable): void
     {
         $error = [

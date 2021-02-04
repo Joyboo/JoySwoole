@@ -23,10 +23,12 @@ class Central implements TaskInterface
     public function run(int $taskId, int $workerIndex)
     {
         // 执行逻辑
+        var_dump('this is sync task', $this->data);
     }
 
     public function onException(\Throwable $throwable, int $taskId, int $workerIndex)
     {
         // 异常处理
+        throw $throwable;
     }
 }

@@ -219,7 +219,7 @@ function wechatWarning($msg, $file = '', $line = 0)
 {
     $data = [
         'title' => "程序发生错误：第{$line}行",
-        'keyword1' => "文件： {$file}",
+        'keyword1' => "相关文件： {$file}",
         'keyword2' => "相关内容：{$msg}",
     ];
     $time = time();

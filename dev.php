@@ -34,6 +34,16 @@ $_config = [
             'pwd' => '0987abc123'
         ]
     ],
+
+    'wechat' => [
+        'appId' => get_cfg_var('env.wechat_app_id'),
+        'appSecret' => get_cfg_var('env.wechat_app_secret'),
+        'token' => get_cfg_var('env.wechat_token'),
+
+        'templateId' => 'KvYPbmyMATKvpuxc4OornkFINZSTZ41vMqEjGq63svk', // 默认使用的模板id
+        'url' => 'http://www.baidu.com', // 点击跳转到哪里去
+        'touser' => 'oLtkP5y8bdhhu-h13l5M-3U6Rchs', // 默认接受的openid
+    ],
     // 是否需要做自动注册
     'crontab' => [
         \App\Crontab\Central::class

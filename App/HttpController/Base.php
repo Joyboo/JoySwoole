@@ -29,7 +29,8 @@ abstract class Base extends Controller
 
         trace($error, 'error');
         if (runEnvDev()) {
-            $this->response()->getStatusCode(Status::CODE_INTERNAL_SERVER_ERROR);
+            $this->response()->withStatus(Status::CODE_INTERNAL_SERVER_ERROR);
+            $this->response()->withHeader('Content-type', 'application/json;charset=utf-8');
             $this->response()->write("<pre>" . var_export($error, true) . "</pre>");
         }
     }

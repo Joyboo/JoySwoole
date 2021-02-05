@@ -5,6 +5,7 @@ namespace EasySwoole\EasySwoole;
 
 use App\Hander\LogHander;
 use App\Hander\TriggerHander;
+use App\WeChat\WeChatManager;
 use EasySwoole\Component\Process\Exception;
 use EasySwoole\Component\Process\Manager;
 use EasySwoole\Component\Timer;
@@ -17,6 +18,7 @@ use EasySwoole\RedisPool\RedisPool;
 use EasySwoole\Redis\Config\RedisConfig;
 use EasySwoole\ORM\Db\Result;
 use EasySwoole\Mysqli\QueryBuilder;
+use EasySwoole\WeChat\WeChat;
 
 class EasySwooleEvent implements Event
 {
@@ -58,6 +60,8 @@ class EasySwooleEvent implements Event
         $register->set(EventRegister::onClose, function (\Swoole\Server $ws, $fd) {
             echo "client-{$fd} is closed\n";
         });
+
+        self::registerWeChat();
 
         // 注册消费进程
         self::registerWorker();
@@ -282,5 +286,18 @@ class EasySwooleEvent implements Event
         if (!in_array(PHP_OS, ['Darwin', 'CYGWIN', 'WINNT']) && !empty($processName)) {
             cli_set_process_title($processName);
         }
+    }
+
+    public static function registerWeChat()
+    {
+        $weChatConfig = new \EasySwoole\WeChat\Config();
+        $weChatConfig->setTempDir(config('LOG_DIR') . '/wechat/');
+
+        $weChatConfig->officialAccount()->setAppId(config('wechat.appId'));
+        $weChatConfig->officialAccount()->setAppSecret(config('wechat.appSecret'));
+        $weChatConfig->officialAccount()->setToken(config('wechat.token'));
+
+        $weChat = new WeChat($weChatConfig);
+        WeChatManager::getInstance()->register('default', $weChat);
     }
 }

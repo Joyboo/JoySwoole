@@ -2,6 +2,7 @@
 
 // 公共函数库
 
+use App\WeChat\WeChatManager;
 use EasySwoole\EasySwoole\Config;
 use EasySwoole\EasySwoole\Core;
 use EasySwoole\EasySwoole\Logger;
@@ -189,4 +190,20 @@ function getLogDirByStamp($stamp = 0)
         $logDir .= '/' . date($format, $stamp);
     }
     return rtrim($logDir, '/') . '/';
+}
+
+/**
+ * 发送公众号模板消息
+ * @param $data
+ */
+function sendWeChatMessge($data)
+{
+    $tempData = [
+        'first' => $data['title'],
+        'keyword1' => $data['keyword1'],
+        'keyword2' => $data['keyword2'],
+        'keyword3' => date('Y年m月d日 H:i:s'),
+        'remark' => '查看详情'
+    ];;
+    WeChatManager::getInstance()->sendTemplateMessage($tempData);
 }

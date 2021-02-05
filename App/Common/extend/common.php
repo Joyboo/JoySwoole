@@ -6,6 +6,7 @@ use App\WeChat\WeChatManager;
 use EasySwoole\EasySwoole\Config;
 use EasySwoole\EasySwoole\Core;
 use EasySwoole\EasySwoole\Logger;
+use EasySwoole\Utility\File;
 
 if (!function_exists('model')) {
     /**
@@ -206,4 +207,35 @@ function sendWeChatMessge($data)
         'remark' => '查看详情'
     ];;
     WeChatManager::getInstance()->sendTemplateMessage($tempData);
+}
+
+/**
+ * 发送微信报警
+ * @param $msg
+ * @param $file
+ * @param int $line
+ */
+function wechatWarning($msg, $file = '', $line = 0)
+{
+    $data = [
+        'title' => "程序发生错误：第{$line}行",
+        'keyword1' => "文件： {$file}",
+        'keyword2' => "相关内容：{$msg}",
+    ];
+    $time = time();
+    $strId = md5(json_encode($data));
+    $chkFile = config('LOG_DIR') . '/wechat/checktime_'. date('Ymd') .'.log';
+    File::touchFile($chkFile, false);
+    $content = file_get_contents($chkFile);
+    $arr = json_decode($content, true);
+    if ($arr) {
+        $last = $arr[$strId]['time'] ?? '';
+        $limit = config('wechat.err_limit_time') * 60;
+        if ($last && $last > $time - $limit) {
+            return;
+        }
+    }
+    $arr[$strId]['time'] = $time;
+    file_put_contents($chkFile, json_encode($arr));
+    sendWeChatMessge($data);
 }

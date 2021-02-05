@@ -43,6 +43,7 @@ $_config = [
         'templateId' => 'KvYPbmyMATKvpuxc4OornkFINZSTZ41vMqEjGq63svk', // 默认使用的模板id
         'url' => 'http://www.baidu.com', // 点击跳转到哪里去
         'touser' => 'oLtkP5y8bdhhu-h13l5M-3U6Rchs', // 默认接受的openid
+        'err_limit_time' => 5, // 程序错误时，相同的内容多长时间内不重复发送，单位分钟
     ],
     // 是否需要做自动注册
     'crontab' => [

@@ -27,25 +27,25 @@ class WebSocketParser implements ParserInterface
         $data = json_decode($raw, true);
         if (!is_array($data)) {
             // 是否需要关闭连接???
-            $this->respClient($client, Response::STATUS_OK, "WebSocket decode message error: " . var_export($raw, true));
+            $this->respClient($client, "WebSocket decode message error: " . var_export($raw, true));
             return null;
         }
-        // new 调用者对象
-        $caller =  new Caller();
 
         $class = '\\App\\WebSocket\\Controller\\'. ucfirst($data['class'] ?? 'Index');
         if (!class_exists($class)) {
-            $this->respClient($client, Response::STATUS_OK, "WebSocket Controller not fount: {$class}");
+            $this->respClient($client, "WebSocket Controller not fount: {$class}");
             return null;
         }
-        $caller->setControllerClass($class);
 
         $action = $data['action'] ?? 'index';
         if (!method_exists($class, $action)) {
-            $this->respClient($client, Response::STATUS_OK, "WebSocket Action not fount: {$class}.{$action}");
+            $this->respClient($client, "WebSocket Action not fount: {$class}.{$action}");
             return null;
         }
-        // 设置被调用的方法
+
+        // new 调用者对象
+        $caller = new Caller();
+        $caller->setControllerClass($class);
         $caller->setAction($action);
 
         // 设置被调用的Args
@@ -68,8 +68,19 @@ class WebSocketParser implements ParserInterface
         return $response->getMessage();
     }
 
-    protected function respClient($client, $status, $message)
+
+    /**
+     * 出错，响应客户端
+     * @param WebSocket $client
+     * @param string $message
+     * @param string $status
+     */
+    protected function respClient($client, $message, $status = '')
     {
+        // 默认正常响应
+        if (empty($status)) {
+            $status = Response::STATUS_OK;
+        }
         $server = ServerManager::getInstance()->getSwooleServer();
         $response = new Response([
             'status' => $status,
@@ -82,7 +93,7 @@ class WebSocketParser implements ParserInterface
         logger()->error($data, 'error');
         $fd = $client->getFd();
         if ($server->isEstablished($fd)) {
-            $server->push($fd, $data,$response->getOpCode(),$response->isFinish());
+            $server->push($fd, $data, $response->getOpCode(), $response->isFinish());
         }
     }
 }

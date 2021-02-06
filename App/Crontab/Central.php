@@ -29,12 +29,12 @@ class Central extends Base
         $task = TaskManager::getInstance();
         foreach ($cron as $value) {
             if (!CronExpression::isValidExpression($value['rule'])) {
-                logger()->error("运行规则设置错误 " . json_encode($value->toArray(), JSON_UNESCAPED_UNICODE));
+                logger()->error("运行规则设置错误 " . json_encode($value->toArray(), JSON_UNESCAPED_UNICODE), 'error');
                 continue;
             }
             $className = $value['class'];
             if (!class_exists($className)) {
-                logger()->error("{$className} 不存在");
+                logger()->error("{$className} 不存在", 'error');
                 continue;
             }
             $isDue = CronExpression::factory($value['rule'])->isDue();

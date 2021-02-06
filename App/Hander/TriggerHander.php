@@ -30,7 +30,7 @@ class TriggerHander implements TriggerInterface
             'line' => $throwable->getLine(),
             'trace' => $throwable->getTrace()
         ];
-        logger()->error(json_encode($msg));
+        logger()->error(json_encode($msg), 'error');
 
         wechatWarning($msg['message'], $msg['file'], $msg['line']);
     }

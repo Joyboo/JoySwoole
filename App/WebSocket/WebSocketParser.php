@@ -25,17 +25,26 @@ class WebSocketParser implements ParserInterface
         // 解析 客户端原始消息
         $data = json_decode($raw, true);
         if (!is_array($data)) {
-            echo "decode message error! \n";
+            logger()->error("WebSocket decode message error: " . var_export($data, true), 'error');;
             return null;
         }
         // new 调用者对象
         $caller =  new Caller();
 
         $class = '\\App\\WebSocket\\Controller\\'. ucfirst($data['class'] ?? 'Index');
+        if (!class_exists($class)) {
+            logger()->error("WebSocket Controller not fount: {$class}", 'error');
+            return null;
+        }
         $caller->setControllerClass($class);
 
+        $action = $data['action'] ?? 'index';
+        if (!method_exists($class, $action)) {
+            logger()->error("WebSocket Action not fount: {$class}.{$action}", 'error');
+            return null;
+        }
         // 设置被调用的方法
-        $caller->setAction($data['action'] ?? 'index');
+        $caller->setAction($action);
 
         // 设置被调用的Args
         $args = ($data && is_array($data)) ? $data : [];

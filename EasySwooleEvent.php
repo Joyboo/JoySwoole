@@ -5,6 +5,8 @@ namespace EasySwoole\EasySwoole;
 
 use App\Hander\LogHander;
 use App\Hander\TriggerHander;
+use App\WebSocket\WebSocketEvents;
+use App\WebSocket\WebSocketParser;
 use App\WeChat\WeChatManager;
 use EasySwoole\Component\Process\Exception;
 use EasySwoole\Component\Process\Manager;
@@ -12,6 +14,7 @@ use EasySwoole\Component\Timer;
 use EasySwoole\EasySwoole\AbstractInterface\Event;
 use EasySwoole\EasySwoole\Crontab\Crontab;
 use EasySwoole\EasySwoole\Swoole\EventRegister;
+use EasySwoole\FastCache\Cache;
 use EasySwoole\ORM\Db\Connection;
 use EasySwoole\ORM\DbManager;
 use EasySwoole\RedisPool\RedisPool;
@@ -19,6 +22,9 @@ use EasySwoole\Redis\Config\RedisConfig;
 use EasySwoole\ORM\Db\Result;
 use EasySwoole\Mysqli\QueryBuilder;
 use EasySwoole\WeChat\WeChat;
+use EasySwoole\Socket\Dispatcher;
+use Swoole\Websocket\Server as WSserver;
+use Swoole\WebSocket\Frame;
 
 class EasySwooleEvent implements Event
 {
@@ -44,22 +50,27 @@ class EasySwooleEvent implements Event
 
     public static function mainServerCreate(EventRegister $register)
     {
+        /*********** 处理ws事件 *********/
         $register->set(EventRegister::onManagerStart, function (\Swoole\Server $server) {
-            self::setProcessName(config('SERVER_NAME') . '.manager');
+            self::setProcessName(config('SERVER_NAME') . '.Manager');
         });
-        $register->set(EventRegister::onOpen, function ($ws, $request) {
-            var_dump($request->fd, $request->server);
-            $ws->push($request->fd, "hello, welcome\n");
+        // 创建一个 Dispatcher 配置
+        $conf = new \EasySwoole\Socket\Config();
+        // 设置 Dispatcher 为 WebSocket 模式
+        $conf->setType(\EasySwoole\Socket\Config::WEB_SOCKET);
+        // 设置解析器对象
+        $conf->setParser(new WebSocketParser());
+        // 创建 Dispatcher 对象 并注入 config 对象
+        $dispatch = new Dispatcher($conf);
+        // 给server 注册相关事件 在 WebSocket 模式下  on message 事件必须注册 并且交给 Dispatcher 对象处理
+        $register->set(EventRegister::onMessage, function (WSserver $server, Frame $frame) use ($dispatch) {
+            $dispatch->dispatch($server, $frame->data, $frame);
         });
+        // 注册服务事件
+        $register->add(EventRegister::onOpen, [WebSocketEvents::class, 'onOpen']);
+        $register->add(EventRegister::onClose, [WebSocketEvents::class, 'onClose']);
 
-        $register->set(EventRegister::onMessage, function (\Swoole\WebSocket\Server $server, \Swoole\WebSocket\Frame $frame) {
-            echo "Message: {$frame->data}\n";
-            $server->push($frame->fd, "server: {$frame->data}");
-        });
 
-        $register->set(EventRegister::onClose, function (\Swoole\Server $ws, $fd) {
-            echo "client-{$fd} is closed\n";
-        });
 
         self::registerWeChat();
 
@@ -72,6 +83,11 @@ class EasySwooleEvent implements Event
         /*Timer::getInstance()->loop(10 * 1000, function () {
             echo "this timer runs at intervals of 10 seconds\n";
         });*/
+
+        // fast-cache
+        $fastCache = Cache::getInstance();
+        $fastCache->getConfig()->setTempDir(EASYSWOOLE_TEMP_DIR);
+        $fastCache->attachToServer(ServerManager::getInstance()->getSwooleServer());
     }
 
     /**
@@ -128,40 +144,9 @@ class EasySwooleEvent implements Event
      */
     public static function registerRedis()
     {
-        $poolCfg = config('redis_poll');
-        $redisCfg = config('redis');
-
-        $redisConfig = new RedisConfig();
-        if (isset($redisCfg['host'])) {
-            $redisConfig->setHost($redisCfg['host']);
-        }
-        if (isset($redisCfg['port'])) {
-            $redisConfig->setPort($redisCfg['port']);
-        }
-        if (isset($redisCfg['auth'])) {
-            $redisConfig->setAuth($redisCfg['auth']);
-        }
-        if (isset($redisCfg['timeout'])) {
-            $redisConfig->setTimeout($redisCfg['timeout']);
-        }
-        if (isset($redisCfg['db'])) {
-            $redisConfig->setDb($redisCfg['db']);
-        }
-        if (isset($redisCfg['unixsock'])) {
-            $redisConfig->setUnixSocket($redisCfg['unixsock']);
-        }
-
-        $redisPoolConfig = RedisPool::getInstance()->register($redisConfig);
-        if (isset($poolCfg['min_num'])) {
-            $redisPoolConfig->setMinObjectNum($poolCfg['min_num']);
-        }
-        if (isset($poolCfg['max_num'])) {
-            $redisPoolConfig->setMaxObjectNum($poolCfg['max_num']);
-        }
-        if (isset($poolCfg['max_idle'])) {
-            $redisPoolConfig->setMaxIdleTime($poolCfg['max_idle']);
-        }
-        // ...
+        $config = config('redis') ?? [];
+        $redisConfig = new RedisConfig($config);
+        RedisPool::getInstance()->register($redisConfig);
     }
 
     /**
@@ -170,7 +155,7 @@ class EasySwooleEvent implements Event
      */
     public static function registerDb()
     {
-        $config = config('mysql');
+        $config = config('mysql') ?? [];
         $slow = intval(config('mysql_slow_time'));
 
         if (empty($config)) {
@@ -178,24 +163,7 @@ class EasySwooleEvent implements Event
         }
 
         foreach ($config as $key => $value) {
-            $dbConfig = new \EasySwoole\ORM\Db\Config();
-            $dbConfig->setDatabase($value['dbname']);
-            $dbConfig->setUser($value['user'] ?? 'root');
-            $dbConfig->setPassword($value['pwd'] ?? '');
-            $dbConfig->setHost($value['host'] ?? '127.0.0.1');
-
-            if (isset($value['port'])) {
-                $dbConfig->setPort($value['port']);
-            }
-            if (isset($value['timeout'])) {
-                $dbConfig->setTimeout($value['timeout']);
-            }
-            if (isset($value['charset'])) {
-                $dbConfig->setCharset($value['charset']);
-            }
-            if (isset($value['auto_ping'])) {
-                $dbConfig->setAutoPing($value['auto_ping']);
-            }
+            $dbConfig = new \EasySwoole\ORM\Db\Config($value);
 
             /************ 连接池配置************/
 

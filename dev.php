@@ -27,11 +27,12 @@ $_config = [
 
     'mysql' => [
         'new_central' => [
-            'dbname' => 'new_central',
-//            'dbname' => 'joyboo',
+            'database' => 'new_central',
+//            'database' => 'joyboo',
             'host' => '127.0.0.1',
             'port' => 3306,
-            'pwd' => '0987abc123'
+            'user' => 'root',
+            'password' => '0987abc123'
         ]
     ],
 

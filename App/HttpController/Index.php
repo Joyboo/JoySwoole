@@ -16,7 +16,7 @@ class Index extends Base
         $this->response()->write(file_get_contents($file));
     }
 
-    function test()
+    public function test()
     {
         $this->response()->write('this is test');
     }

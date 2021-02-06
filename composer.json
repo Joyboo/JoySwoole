@@ -23,7 +23,6 @@
         "easyswoole/pay": "^1.2",
         "easyswoole/http-annotation": "^1.4",
         "easyswoole/ddl": "^1.0",
-        "easyswoole/spider": "^2.0",
         "easyswoole/task": "^1.1",
         "easyswoole/redis-pool": "^2.2",
         "easyswoole/session": "2.x",
@@ -31,7 +30,8 @@
         "easyswoole/verifycode": "3.x",
         "easyswoole/validate": "^1.2",
         "easyswoole/i18n": "^1.0",
-        "easyswoole/curl": "^1.0"
+        "easyswoole/curl": "^1.0",
+        "easyswoole/fast-cache": "^2.0"
     },
     "autoload": {
         "psr-4": {

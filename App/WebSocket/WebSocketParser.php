@@ -31,7 +31,7 @@ class WebSocketParser implements ParserInterface
             return null;
         }
 
-        $class = '\\App\\WebSocket\\Controller\\'. ucfirst($data['class'] ?? 'Index');
+        $class = '\\App\\WebSocket\\Controller\\'. (ucfirst($data['class'] ?? 'Index'));
         if (!class_exists($class)) {
             $this->respClient($client, "WebSocket Controller not fount: {$class}");
             return null;
@@ -47,10 +47,7 @@ class WebSocketParser implements ParserInterface
         $caller = new Caller();
         $caller->setControllerClass($class);
         $caller->setAction($action);
-
-        // 设置被调用的Args
-        $args = ($data && is_array($data)) ? $data : [];
-        $caller->setArgs($args);
+        $caller->setArgs($data);
         return $caller;
     }
     /**

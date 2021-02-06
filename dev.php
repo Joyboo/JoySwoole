@@ -10,12 +10,14 @@ $_config = [
         'SETTING' => [
             'worker_num' => 3,
             'reload_async' => true,
-            'max_wait_time'=>3
+            'max_wait_time' => 3,
+            'document_root' => EASYSWOOLE_ROOT,
+            'enable_static_handler' => true
         ],
-        'TASK'=>[
-            'workerNum'=>2,
-            'maxRunningNum'=>128,
-            'timeout'=>15
+        'TASK' => [
+            'workerNum' => 2,
+            'maxRunningNum' => 128,
+            'timeout'=> 15
         ]
     ],
     // .sock连接目录

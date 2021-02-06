@@ -69,6 +69,7 @@ class EasySwooleEvent implements Event
         // 注册服务事件
         $register->add(EventRegister::onOpen, [WebSocketEvents::class, 'onOpen']);
         $register->add(EventRegister::onClose, [WebSocketEvents::class, 'onClose']);
+        $register->add(EventRegister::onWorkerError, [WebSocketEvents::class, 'onError']);
 
 
 
@@ -85,9 +86,8 @@ class EasySwooleEvent implements Event
         });*/
 
         // fast-cache
-        $fastCache = Cache::getInstance();
-        $fastCache->getConfig()->setTempDir(EASYSWOOLE_TEMP_DIR);
-        $fastCache->attachToServer(ServerManager::getInstance()->getSwooleServer());
+        $fastConfig = new \EasySwoole\FastCache\Config(config('fast_cache') ?? []);
+        Cache::getInstance($fastConfig)->attachToServer(ServerManager::getInstance()->getSwooleServer());
     }
 
     /**
@@ -102,11 +102,12 @@ class EasySwooleEvent implements Event
             $worker = array_merge($worker, $cfgWorker);
         }
 
+        $proName = config('SERVER_NAME');
         foreach ($worker as $key => $value) {
             $key = ucfirst($key);
 
             $proCfg = [
-                'processName' => $key,
+                'processName' => $proName . '.' . $key,
                 'processGroup' => 'report',
                 'arg' => $value, // 传递参数到自定义进程中
                 'enableCoroutine' => true, // 设置 自定义进程自动开启协程环境

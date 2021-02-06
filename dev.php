@@ -56,6 +56,12 @@ $_config = [
     'redis_poll' => [],
     // 日志目录格式
     'logger_dir_format' => 'Ym',
+
+    'fast_cache' => [
+        'tempDir' => '/tmp/easyswoole', // 同上面的TEMP_DIR目录
+        'serverName' => 'easyswoole',
+        'workerNum' => 2
+    ]
 ];
 
 // model命名空间

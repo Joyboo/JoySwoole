@@ -25,6 +25,11 @@ use EasySwoole\WeChat\WeChat;
 use EasySwoole\Socket\Dispatcher;
 use Swoole\Websocket\Server as WSserver;
 use Swoole\WebSocket\Frame;
+use EasySwoole\Component\Di;
+use EasySwoole\EasySwoole\SysConst;
+use EasySwoole\Http\Request;
+use EasySwoole\Http\Response;
+use EasySwoole\Http\Message\Status;
 
 class EasySwooleEvent implements Event
 {
@@ -46,6 +51,20 @@ class EasySwooleEvent implements Event
 
         // 注册redis连接池
         self::registerRedis();
+
+        // 注册全局onRequest,支持跨域
+        Di::getInstance()->set(SysConst::HTTP_GLOBAL_ON_REQUEST, function (Request $request, Response $response){
+            $response->withHeader('Access-Control-Allow-Origin', '*');
+            $response->withHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+            $response->withHeader('Access-Control-Allow-Credentials', 'true');
+            $response->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+            if ($request->getMethod() === 'OPTIONS') {
+                $response->withStatus(Status::CODE_OK);
+                return false;
+            }
+            $response->withHeader('Content-type', 'application/json;charset=utf-8');
+            return true;
+        });
     }
 
     public static function mainServerCreate(EventRegister $register)
@@ -123,7 +142,7 @@ class EasySwooleEvent implements Event
                     $processConfig = new \EasySwoole\Component\Process\Config($proCfg);
                     $customProcess = new $class($processConfig);
                     // 注入DI
-                    \EasySwoole\Component\Di::getInstance()->set($key, $customProcess->getProcess());
+                    Di::getInstance()->set($key, $customProcess->getProcess());
                     Manager::getInstance()->addProcess($customProcess);
                     break;
                 case "redis":

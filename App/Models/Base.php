@@ -41,4 +41,17 @@ abstract class Base extends AbstractModel
             $this->setAttr($key, $val);
         }
     }
+
+    public function getAll(int $page = 1, int $pageSize = 10, string $field = '*'): array
+    {
+        $list = $this
+            ->withTotalCount()
+            ->order($this->schemaInfo()->getPkFiledName(), 'DESC')
+            ->field($field)
+            ->limit($pageSize * ($page - 1), $pageSize)
+            ->all();
+        $total = $this->lastQueryResult()->getTotalCount();;
+        return ['total' => $total, 'list' => $list];
+    }
+
 }

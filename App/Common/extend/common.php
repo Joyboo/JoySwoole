@@ -223,8 +223,8 @@ function wechatWarning($msg, $file = '', $line = 0)
         'keyword2' => "相关内容：{$msg}",
     ];
     $time = time();
-    $strId = md5(json_encode($data));
-    $chkFile = config('LOG_DIR') . '/wechat/checktime_'. date('Ymd') .'.log';
+    $strId = md5($file);
+    $chkFile = config('LOG_DIR') . '/wechat/checktime.log';
     File::touchFile($chkFile, false);
     $content = file_get_contents($chkFile);
     $arr = json_decode($content, true);

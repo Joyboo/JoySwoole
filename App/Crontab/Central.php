@@ -20,8 +20,9 @@ class Central extends Base
         return '* * * * *';
     }
 
-    function run(int $taskId,int $workerIndex)
+    public function run(int $taskId,int $workerIndex)
     {
+        // 获取执行Crontab列表
         $cron = model('Crontab')->getCrontab();
         if (empty($cron)) {
             return;
@@ -39,10 +40,12 @@ class Central extends Base
             }
             $isDue = CronExpression::factory($value['rule'])->isDue();
             if (!$isDue) {
+                // 时间未到
                 continue;
             }
             // 尝试json_decode
             $args = json_decode($value['args'], true);
+            // 投递给异步任务
             $task->async(new $className(is_array($args) ? $args : $value['args']));
         }
     }

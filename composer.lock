@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b239f25f535c2e9cbde1133769ccb18e",
+    "content-hash": "1471b1b20a3d6c3eb98a0c56f1569f2d",
     "packages": [
         {
             "name": "doctrine/lexer",
@@ -1570,21 +1570,21 @@
         },
         {
             "name": "easyswoole/queue",
-            "version": "2.1.0",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/easy-swoole/queue.git",
-                "reference": "f2046d61064c53caf47d4705935c24e83bef7b5b"
+                "reference": "023575409698d40275b7d86b88f80a98f16d8a0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/easy-swoole/queue/zipball/f2046d61064c53caf47d4705935c24e83bef7b5b",
-                "reference": "f2046d61064c53caf47d4705935c24e83bef7b5b",
+                "url": "https://api.github.com/repos/easy-swoole/queue/zipball/023575409698d40275b7d86b88f80a98f16d8a0f",
+                "reference": "023575409698d40275b7d86b88f80a98f16d8a0f",
                 "shasum": ""
             },
             "require": {
                 "easyswoole/component": "^2.0",
-                "easyswoole/redis-pool": "~2.2.0",
+                "easyswoole/redis-pool": "^2.2",
                 "ext-swoole": ">=4.4.0"
             },
             "require-dev": {
@@ -1609,9 +1609,9 @@
             ],
             "support": {
                 "issues": "https://github.com/easy-swoole/queue/issues",
-                "source": "https://github.com/easy-swoole/queue/tree/2.1.0"
+                "source": "https://github.com/easy-swoole/queue/tree/3.0.1"
             },
-            "time": "2021-01-02T13:45:47+00:00"
+            "time": "2021-02-23T02:51:39+00:00"
         },
         {
             "name": "easyswoole/redis",

@@ -8,6 +8,7 @@ use App\Hander\TriggerHander;
 use App\WebSocket\WebSocketEvents;
 use App\WebSocket\WebSocketParser;
 use App\WeChat\WeChatManager;
+use App\Worker\Queue;
 use EasySwoole\Component\Process\Exception;
 use EasySwoole\Component\Process\Manager;
 use EasySwoole\Component\Timer;
@@ -17,6 +18,7 @@ use EasySwoole\EasySwoole\Swoole\EventRegister;
 use EasySwoole\FastCache\Cache;
 use EasySwoole\ORM\Db\Connection;
 use EasySwoole\ORM\DbManager;
+use App\Queue\RedisQueue;
 use EasySwoole\RedisPool\RedisPool;
 use EasySwoole\Redis\Config\RedisConfig;
 use EasySwoole\ORM\Db\Result;
@@ -126,7 +128,7 @@ class EasySwooleEvent implements Event
             $key = ucfirst($key);
 
             $proCfg = [
-                'processName' => $proName . '.' . $key,
+                'processName' => $proName . '.my-' . $key,
                 'processGroup' => 'report',
                 'arg' => $value, // 传递参数到自定义进程中
                 'enableCoroutine' => true, // 设置 自定义进程自动开启协程环境
@@ -167,6 +169,10 @@ class EasySwooleEvent implements Event
         $config = config('redis') ?? [];
         $redisConfig = new RedisConfig($config);
         RedisPool::getInstance()->register($redisConfig);
+
+        // 注册redis队列
+        $driver = new \EasySwoole\Queue\Driver\RedisQueue($redisConfig);
+        RedisQueue::getInstance($driver);
     }
 
     /**

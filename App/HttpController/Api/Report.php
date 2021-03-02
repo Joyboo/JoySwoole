@@ -33,6 +33,12 @@ class Report extends ApiBase
     {
         $job = new Job();
         $job->setJobData(['test'=>'测试','time'=>time()]);
+
+        // 任务如果没有确认，则会执行三次
+        $job->setRetryTimes(3);
+        // 如果5秒内没确认任务，会重新回到队列。默认为3秒
+        $job->setWaitConfirmTime(5);
+
         $result = RedisQueue::getInstance()->producer()->push($job);
         $this->writeJson(Status::CODE_OK, Status::getReasonPhrase(Status::CODE_OK), $result);
     }

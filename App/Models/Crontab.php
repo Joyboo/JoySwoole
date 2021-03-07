@@ -14,22 +14,22 @@ class Crontab extends Base
         return $this->where('status', 0)->where("(gid = 0 or FIND_IN_SET ({$gid},gid) > 0)")->all();
     }
 
-    public function index()
+    public function index($data = [])
     {
         $this->timelock(__METHOD__);
     }
 
-    public function test()
+    public function test($data = [])
     {
         $this->timelock(__METHOD__);
     }
 
-    public function test1()
+    public function test1($data = [])
     {
         $this->timelock(__METHOD__);
     }
 
-    public function test2()
+    public function test2($data = [])
     {
         $this->timelock(__METHOD__);
     }
@@ -39,7 +39,7 @@ class Crontab extends Base
      * @param $name
      * @param int $sec
      */
-    protected function timelock($name, $sec = 61)
+    protected function timelock($name, $sec = 10)
     {
         while ($sec > 0) {
             var_dump("this is Models {$name}: $sec");

@@ -13,8 +13,14 @@ class Central extends Base
 {
     public function run(int $taskId, int $workerIndex)
     {
-        $className = "\\App\\Models\\" . ucfirst($this->data['class'] ?? 'Crontab');
-        $method = $this->data['method'] ?? 'index';
+        $data = $this->data;
+        if (!is_array($data)) {
+            logger()->error(__METHOD__ . "仅支持数组传参, data:" . var_export($data, true), 'error');
+            return;
+        }
+
+        $className = "\\App\\Models\\" . ucfirst($data['class'] ?? 'Crontab');
+        $method = $data['method'] ?? 'index';
 
         // 参数可控，暂时不需要使用反射
 //        $ref = new \ReflectionClass($className);
@@ -31,11 +37,12 @@ class Central extends Base
                 return;
             }
 
-            (new $className())->$method();
+            unset($data['class'], $data['method']);
+            (new $className())->$method($data);
         } catch (\Exception | \Throwable $e) {
             logger()->error($e->getMessage(), 'error');
             return $e->getMessage();
         }
-        return "执行完成!! " . __METHOD__;
+        return "执行完成!! $className -> $method";
     }
 }

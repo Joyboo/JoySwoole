@@ -49,7 +49,7 @@ class Central extends Base
             $class = new $className(is_array($args) ? $args : $value['args']);
             // 投递给异步任务
             $task->async($class, function ($reply, $taskId, $workerIndex) use ($value) {
-                logger()->info("task finish! {$value['taskname']}, reply={$reply}, taskid={$taskId}");
+                trace("task finish! {$value['taskname']}, reply={$reply}, taskid={$taskId}");
             });
         }
     }

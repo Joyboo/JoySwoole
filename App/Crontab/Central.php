@@ -45,8 +45,12 @@ class Central extends Base
             }
             // 尝试json_decode
             $args = json_decode($value['args'], true);
+
+            $class = new $className(is_array($args) ? $args : $value['args']);
             // 投递给异步任务
-            $task->async(new $className(is_array($args) ? $args : $value['args']));
+            $task->async($class, function ($reply, $taskId, $workerIndex) use ($value) {
+                logger()->info("task finish! {$value['taskname']}, reply={$reply}, taskid={$taskId}");
+            });
         }
     }
 }

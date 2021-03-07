@@ -13,7 +13,7 @@ return [
     ],
     'queue' => [
         'remark' => '消息队列',
-//        'psnum' => 2, // 启动进程数量
-        'type' => 'process',
+        'psnum' => 3, // 启动进程数量
+        'type' => 'redis',
     ]
 ];
